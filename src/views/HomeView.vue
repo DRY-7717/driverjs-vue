@@ -1,8 +1,20 @@
 <template>
   <div class="w-[500px] mx-auto mt-24">
-    <div class="flex justify-around items-center p-3 test">
-      <Input />
-      <Button />
+    <div id="highlight-step-1" class="flex justify-between items-center p-3 test">
+      <div class="box-input w-[200px]" id="input-1">
+        <input class="w-full py-1 px-4 outline-none border-none rounded-md shadow-lg ring-1 ring-blue-300">
+      </div>
+      <button id="button-1" class="block px-6 py-1 text-white rounded-md bg-blue-500 shadow-lg">
+        Submit
+      </button>
+    </div>
+    <div id="highlight-step-2" class="flex justify-between items-center p-3 test">
+      <div class="box-input w-[300px]" id="input-2">
+        <input class="w-full py-1 px-4 outline-none border-none rounded-md shadow-lg ring-1 ring-blue-300">
+      </div>
+      <button id="button-2" class="block px-6 py-1 text-white rounded-md bg-blue-500 shadow-lg">
+        Submit
+      </button>
     </div>
   </div>
 </template>
@@ -20,27 +32,27 @@ const driverObj = driver({
   showProgress: true,
   showButtons: ['close'],
   popoverClass: 'customClass',
-  stagePadding: 7,
+  stagePadding: 10,
   stageRadius: 10,
   progressText: '{{current}} dari {{total}}',
   steps: [
     {
-      element: '#input',
+      element: "#virtual-wrapper", // Soroti elemen virtual
       popover: {
-        title: 'Animated Tour Example',
-        description: 'Here is the code example showing animated tour. Let\'s walk you through it.',
+        title: "Gabungan Input",
+        description: "Dua elemen Input disorot bersama.",
         side: "bottom",
-        align: 'center'
-      }
+        align: "center",
+      },
     },
     {
-      element: '#button',
+      element: "#virtual-wrapper-button", // Soroti elemen virtual
       popover: {
-        title: 'Import the Library',
-        description: 'It works the same in vanilla JavaScript as well as frameworks.',
+        title: "Gabungan Input",
+        description: "Dua elemen Input disorot bersama.",
         side: "bottom",
-        align: 'center'
-      }
+        align: "center",
+      },
     },
   ],
   onPopoverRender: (popover, { config, state }) => {
@@ -77,7 +89,6 @@ const driverObj = driver({
       popover.footerButtons.appendChild(nextButtonCustom);
 
       nextButtonCustom.addEventListener("click", () => {
-        localStorage.setItem('isopen', true)
         driverObj.destroy();
       });
     }
@@ -93,14 +104,77 @@ const driverObj = driver({
     });
   },
 });
+// ini untuk grouping 2 element yang berbeda lokasi
+function createVirtualWrapper() {
+  // Ambil elemen input
+  const input1 = document.querySelector("#input-1");
+  const input2 = document.querySelector("#input-2");
+
+  // Buat elemen pembungkus
+  let virtualWrapper = document.createElement("div");
+  virtualWrapper.id = "virtual-wrapper";
+  virtualWrapper.style.position = "absolute";
+
+  // Hitung posisi dan ukuran elemen
+  const rect1 = input1.getBoundingClientRect();
+  const rect2 = input2.getBoundingClientRect();
+
+  const top = Math.min(rect1.top, rect2.top);
+  const left = Math.min(rect1.left, rect2.left);
+  const width = Math.max(rect1.right, rect2.right) - left;
+  const height = Math.max(rect1.bottom, rect2.bottom) - top;
+
+  // Terapkan gaya ke elemen pembungkus
+  virtualWrapper.style.top = `${top}px`;
+  virtualWrapper.style.left = `${left}px`;
+  virtualWrapper.style.width = `${width}px`;
+  virtualWrapper.style.height = `${height}px`;
+  virtualWrapper.style.pointerEvents = "none"; // Agar tidak mengganggu interaksi
+  virtualWrapper.style.zIndex = "9999";
+
+  // Tambahkan ke body
+  document.body.appendChild(virtualWrapper);
+}
+function createVirtualWrapperButton() {
+  // Ambil elemen input
+  const input1 = document.querySelector("#button-1");
+  const input2 = document.querySelector("#button-2");
+
+  // Buat elemen pembungkus
+  let virtualWrapperButton = document.createElement("div");
+  virtualWrapperButton.id = "virtual-wrapper-button";
+  virtualWrapperButton.style.position = "absolute";
+
+  // Hitung posisi dan ukuran elemen
+  const rect1 = input1.getBoundingClientRect();
+  const rect2 = input2.getBoundingClientRect();
+
+  const top = Math.min(rect1.top, rect2.top);
+  const left = Math.min(rect1.left, rect2.left);
+  const width = Math.max(rect1.right, rect2.right) - left;
+  const height = Math.max(rect1.bottom, rect2.bottom) - top;
+
+  // Terapkan gaya ke elemen pembungkus
+  virtualWrapperButton.style.top = `${top}px`;
+  virtualWrapperButton.style.left = `${left}px`;
+  virtualWrapperButton.style.width = `${width}px`;
+  virtualWrapperButton.style.height = `${height}px`;
+  virtualWrapperButton.style.pointerEvents = "none"; // Agar tidak mengganggu interaksi
+  virtualWrapperButton.style.zIndex = "9999";
+
+  // Tambahkan ke body
+  document.body.appendChild(virtualWrapperButton);
+}
 
 
 onMounted(() => {
-  const hasTourCompleted = localStorage.getItem('isopen') === 'true';
-  if (!hasTourCompleted) {
-    driverObj.drive();
-  }
+
+  createVirtualWrapper();
+  createVirtualWrapperButton();
+  driverObj.drive();
 });
+
+
 
 </script>
 
